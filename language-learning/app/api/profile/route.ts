@@ -22,6 +22,29 @@ async function fetchFullProfile(supabase: SupabaseClient, userId: string) {
 }
 
 /**
+ * GET /api/profile/{user_id}
+ */
+export async function GET(_: NextRequest, { params }: Params) {
+  const supabaseResult = getSupabaseOrError();
+  if (!supabaseResult.ok) return supabaseResult.response;
+  const supabase = supabaseResult.client;
+
+  const { user_id } = await params;
+  const userId = user_id?.trim();
+  if (!userId) {
+    return jsonError(400, "Validation error", {
+      user_id: "user_id path param is required",
+    });
+  }
+
+  const { data, error } = await fetchFullProfile(supabase, userId);
+  if (error) return jsonError(500, "Internal Server Error", { supabase: error });
+  if (!data) return jsonError(404, "Profile not found", { user_id: userId });
+
+  return NextResponse.json(coerceProfileRow(data), { status: 200 });
+}
+
+/**
  * POST /api/profile
  */
 export async function POST(req: NextRequest) {
