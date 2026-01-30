@@ -32,7 +32,7 @@ export async function GET(_: NextRequest, { params }: Params) {
   const { user_id } = await params;
   const userId = user_id?.trim();
   if (!userId) {
-    return jsonError(400, "Validation error", {
+    return jsonError(400, "Validation error", 
 
 
 /**
